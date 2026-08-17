@@ -17,6 +17,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<ClassSession> ClassSessions => Set<ClassSession>();
     public DbSet<Attendance> Attendances => Set<Attendance>();
+    public DbSet<QuotaRow> QuotaRows => Set<QuotaRow>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

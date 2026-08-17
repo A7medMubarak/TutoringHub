@@ -6,6 +6,7 @@ using TutoringHub.Application.DTOs.Centers;
 using TutoringHub.Application.DTOs.Classes;
 using TutoringHub.Application.DTOs.Students;
 using TutoringHub.Application.DTOs.Enrollments;
+using TutoringHub.Application.DTOs.Quotas;
 using TutoringHub.Application.Validators;
 using TutoringHub.Domain.Enums;
 
@@ -20,6 +21,7 @@ public class ValidatorTests
     private readonly CreateClassRequestValidator _createClass = new();
     private readonly TickAttendanceRequestValidator _tickAttendance = new();
     private readonly EnrollStudentRequestValidator _enrollStudent = new();
+    private readonly CreateQuotaRequestValidator _createQuota = new();
 
     [Fact]
     public void RegisterTeacher_ValidRequest_Passes()
@@ -174,5 +176,65 @@ public class ValidatorTests
         var result = _enrollStudent.TestValidate(new EnrollStudentRequest { StudentId = 10 });
 
         result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CreateQuota_ValidRequest_Passes()
+    {
+        var result = _createQuota.TestValidate(new CreateQuotaRequest
+        {
+            ClassGroupId = 1,
+            TotalSessions = 4,
+            Price = 500,
+            PeriodStart = new DateOnly(2026, 8, 1),
+            PeriodEnd = new DateOnly(2026, 8, 31)
+        });
+
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CreateQuota_ZeroTotalSessions_HasErrors()
+    {
+        var result = _createQuota.TestValidate(new CreateQuotaRequest
+        {
+            ClassGroupId = 1,
+            TotalSessions = 0,
+            Price = 500,
+            PeriodStart = new DateOnly(2026, 8, 1),
+            PeriodEnd = new DateOnly(2026, 8, 31)
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.TotalSessions);
+    }
+
+    [Fact]
+    public void CreateQuota_NegativePrice_HasErrors()
+    {
+        var result = _createQuota.TestValidate(new CreateQuotaRequest
+        {
+            ClassGroupId = 1,
+            TotalSessions = 4,
+            Price = -10,
+            PeriodStart = new DateOnly(2026, 8, 1),
+            PeriodEnd = new DateOnly(2026, 8, 31)
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.Price);
+    }
+
+    [Fact]
+    public void CreateQuota_ReversedPeriod_HasErrors()
+    {
+        var result = _createQuota.TestValidate(new CreateQuotaRequest
+        {
+            ClassGroupId = 1,
+            TotalSessions = 4,
+            Price = 500,
+            PeriodStart = new DateOnly(2026, 8, 31),
+            PeriodEnd = new DateOnly(2026, 8, 1)
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.PeriodEnd);
     }
 }

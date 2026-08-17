@@ -19,5 +19,9 @@ public class AttendanceConfiguration : IEntityTypeConfiguration<Attendance>
             .WithMany()
             .HasForeignKey(a => a.StudentId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(a => a.QuotaRow)
+            .WithMany()
+            .HasForeignKey(a => a.QuotaRowId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

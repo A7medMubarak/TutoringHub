@@ -195,6 +195,39 @@ public class AttendanceServiceTests
     }
 
     [Fact]
+    public async Task UntickAsync_WithPaidQuota_RestoresRemainingSessions()
+    {
+        var center = new Center { Name = "C1", LocationDetails = "Cairo", TeacherId = 3 };
+        var student = NewStudent("Omar", "01000000001", 3);
+        var cls = NewClass(center, 3);
+        var ctx = MockDbContext.Create(centers: [center], students: [student], classGroups: [cls],
+            enrollments: [new Enrollment { Student = student, ClassGroup = cls }]);
+        var service = CreateService(ctx, teacherId: 3);
+        await service.TickAsync(cls.Id, student.Id, SessionDate);
+
+        var quota = new QuotaRow
+        {
+            StudentId = student.Id,
+            ClassGroupId = cls.Id,
+            TotalSessions = 1,
+            RemainingSessions = 0,
+            Price = 500,
+            PeriodStart = new DateOnly(2026, 8, 1),
+            PeriodEnd = new DateOnly(2026, 8, 31),
+            PaidAt = DateTime.UtcNow
+        };
+        ctx.QuotaRows.Add(quota);
+        await ctx.SaveChangesAsync();
+        ctx.Attendances.Single().QuotaRowId = quota.Id;
+        await ctx.SaveChangesAsync();
+
+        await service.UntickAsync(cls.Id, student.Id, SessionDate);
+
+        ctx.Attendances.Should().BeEmpty();
+        ctx.QuotaRows.Single().RemainingSessions.Should().Be(1);
+    }
+
+    [Fact]
     public async Task GetSessionsAsync_ReturnsOwnSessionsWithPresentCountInDateOrder()
     {
         var center = new Center { Name = "C1", LocationDetails = "Cairo", TeacherId = 3 };

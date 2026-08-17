@@ -7,4 +7,6 @@ public class Attendance
     public ClassSession ClassSession { get; set; } = null!;
     public int StudentId { get; set; }
     public Student Student { get; set; } = null!;
+    public int? QuotaRowId { get; set; }
+    public QuotaRow? QuotaRow { get; set; }
 }

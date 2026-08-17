@@ -116,6 +116,15 @@ public class AttendanceService : IAttendanceService
 
         if (attendance is not null)
         {
+            if (attendance.QuotaRowId.HasValue)
+            {
+                var quota = await _context.QuotaRows
+                    .SingleOrDefaultAsync(q => q.Id == attendance.QuotaRowId.Value, cancellationToken);
+
+                if (quota is not null)
+                    quota.RemainingSessions++;
+            }
+
             _context.Attendances.Remove(attendance);
             await _context.SaveChangesAsync(cancellationToken);
         }

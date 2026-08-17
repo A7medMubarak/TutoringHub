@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IClassGroupService, ClassGroupService>();
         services.AddScoped<IAttendanceService, AttendanceService>();
         services.AddScoped<IEnrollmentService, EnrollmentService>();
+        services.AddScoped<IQuotaService, QuotaService>();
         services.AddScoped<ISeedingService, SeedingService>();
 
         services.AddValidatorsFromAssemblyContaining<IAuthService>();
