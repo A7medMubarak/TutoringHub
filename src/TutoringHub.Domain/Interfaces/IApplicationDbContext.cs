@@ -10,6 +10,8 @@ public interface IApplicationDbContext
     DbSet<Center> Centers { get; }
     DbSet<ClassGroup> ClassGroups { get; }
     DbSet<Enrollment> Enrollments { get; }
+    DbSet<ClassSession> ClassSessions { get; }
+    DbSet<Attendance> Attendances { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

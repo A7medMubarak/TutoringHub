@@ -15,6 +15,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Center> Centers => Set<Center>();
     public DbSet<ClassGroup> ClassGroups => Set<ClassGroup>();
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
+    public DbSet<ClassSession> ClassSessions => Set<ClassSession>();
+    public DbSet<Attendance> Attendances => Set<Attendance>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,9 +1,11 @@
 using FluentAssertions;
 using FluentValidation.TestHelper;
 using TutoringHub.Application.DTOs.Auth;
+using TutoringHub.Application.DTOs.Attendance;
 using TutoringHub.Application.DTOs.Centers;
 using TutoringHub.Application.DTOs.Classes;
 using TutoringHub.Application.DTOs.Students;
+using TutoringHub.Application.DTOs.Enrollments;
 using TutoringHub.Application.Validators;
 using TutoringHub.Domain.Enums;
 
@@ -16,6 +18,8 @@ public class ValidatorTests
     private readonly CreateStudentRequestValidator _createStudent = new();
     private readonly CreateCenterRequestValidator _createCenter = new();
     private readonly CreateClassRequestValidator _createClass = new();
+    private readonly TickAttendanceRequestValidator _tickAttendance = new();
+    private readonly EnrollStudentRequestValidator _enrollStudent = new();
 
     [Fact]
     public void RegisterTeacher_ValidRequest_Passes()
@@ -118,5 +122,57 @@ public class ValidatorTests
         });
 
         result.ShouldHaveValidationErrorFor(x => x.StartTime);
+    }
+
+    [Fact]
+    public void TickAttendance_ValidRequest_Passes()
+    {
+        var result = _tickAttendance.TestValidate(new TickAttendanceRequest
+        {
+            StudentId = 10,
+            Date = new DateOnly(2026, 8, 18)
+        });
+
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void TickAttendance_ZeroStudentId_HasErrors()
+    {
+        var result = _tickAttendance.TestValidate(new TickAttendanceRequest
+        {
+            StudentId = 0,
+            Date = new DateOnly(2026, 8, 18)
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.StudentId);
+    }
+
+    [Fact]
+    public void TickAttendance_DefaultDate_HasErrors()
+    {
+        var result = _tickAttendance.TestValidate(new TickAttendanceRequest
+        {
+            StudentId = 10,
+            Date = default
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.Date);
+    }
+
+    [Fact]
+    public void EnrollStudent_ZeroStudentId_HasErrors()
+    {
+        var result = _enrollStudent.TestValidate(new EnrollStudentRequest { StudentId = 0 });
+
+        result.ShouldHaveValidationErrorFor(x => x.StudentId);
+    }
+
+    [Fact]
+    public void EnrollStudent_ValidRequest_Passes()
+    {
+        var result = _enrollStudent.TestValidate(new EnrollStudentRequest { StudentId = 10 });
+
+        result.IsValid.Should().BeTrue();
     }
 }
