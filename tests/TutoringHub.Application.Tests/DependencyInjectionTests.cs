@@ -43,6 +43,9 @@ public class DependencyInjectionTests
             scope.ServiceProvider.GetService<IStudentService>(),
             scope.ServiceProvider.GetService<ICenterService>(),
             scope.ServiceProvider.GetService<IClassGroupService>(),
+            scope.ServiceProvider.GetService<IQuizService>(),
+            scope.ServiceProvider.GetService<IStudentQuizService>(),
+            scope.ServiceProvider.GetService<IMeService>(),
             scope.ServiceProvider.GetService<ISeedingService>(),
             scope.ServiceProvider.GetService<GlobalExceptionHandler>()
         };

@@ -13,6 +13,10 @@ public interface IApplicationDbContext
     DbSet<ClassSession> ClassSessions { get; }
     DbSet<Attendance> Attendances { get; }
     DbSet<QuotaRow> QuotaRows { get; }
+    DbSet<Quiz> Quizzes { get; }
+    DbSet<QuizQuestion> QuizQuestions { get; }
+    DbSet<QuizAssignment> QuizAssignments { get; }
+    DbSet<QuizAttempt> QuizAttempts { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

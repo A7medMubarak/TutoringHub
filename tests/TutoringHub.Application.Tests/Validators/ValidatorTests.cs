@@ -8,6 +8,7 @@ using TutoringHub.Application.DTOs.Students;
 using TutoringHub.Application.DTOs.Enrollments;
 using TutoringHub.Application.DTOs.Quotas;
 using TutoringHub.Application.DTOs.Ai;
+using TutoringHub.Application.DTOs.Quizzes;
 using TutoringHub.Application.Validators;
 using TutoringHub.Domain.Enums;
 
@@ -25,6 +26,9 @@ public class ValidatorTests
     private readonly CreateQuotaRequestValidator _createQuota = new();
     private readonly GenerateAiRequestValidator _generateAi = new();
     private readonly GenerateQuizRequestValidator _generateQuiz = new();
+    private readonly CreateQuizRequestValidator _createQuiz = new();
+    private readonly PublishQuizRequestValidator _publishQuiz = new();
+    private readonly SubmitAttemptRequestValidator _submitAttempt = new();
 
     [Fact]
     public void RegisterTeacher_ValidRequest_Passes()
@@ -338,6 +342,99 @@ public class ValidatorTests
             Topic = "Math",
             QuestionCount = 5,
             QuestionType = QuestionType.TrueFalse
+        });
+
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CreateQuiz_EmptyTitle_HasErrors()
+    {
+        var result = _createQuiz.TestValidate(new CreateQuizRequest
+        {
+            Title = "",
+            Questions = [new GeneratedQuestionDto { Question = "Q", Options = ["A", "B", "C", "D"], CorrectIndex = 0 }]
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.Title);
+    }
+
+    [Fact]
+    public void CreateQuiz_TooLongTitle_HasErrors()
+    {
+        var result = _createQuiz.TestValidate(new CreateQuizRequest
+        {
+            Title = new string('a', 121),
+            Questions = [new GeneratedQuestionDto { Question = "Q", Options = ["A", "B", "C", "D"], CorrectIndex = 0 }]
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.Title);
+    }
+
+    [Fact]
+    public void CreateQuiz_NoQuestions_HasErrors()
+    {
+        var result = _createQuiz.TestValidate(new CreateQuizRequest { Title = "Math" });
+
+        result.ShouldHaveValidationErrorFor(x => x.Questions);
+    }
+
+    [Fact]
+    public void CreateQuiz_TooManyQuestions_HasErrors()
+    {
+        var result = _createQuiz.TestValidate(new CreateQuizRequest
+        {
+            Title = "Math",
+            Questions = Enumerable.Range(0, 31)
+                .Select(_ => new GeneratedQuestionDto { Question = "Q", Options = ["A", "B", "C", "D"], CorrectIndex = 0 })
+                .ToList()
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.Questions);
+    }
+
+    [Fact]
+    public void CreateQuiz_ValidRequest_Passes()
+    {
+        var result = _createQuiz.TestValidate(new CreateQuizRequest
+        {
+            Title = "Math",
+            Questions = [new GeneratedQuestionDto { Question = "Q", Options = ["A", "B", "C", "D"], CorrectIndex = 0 }]
+        });
+
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void PublishQuiz_NoClasses_HasErrors()
+    {
+        var result = _publishQuiz.TestValidate(new PublishQuizRequest { ClassGroupIds = [] });
+
+        result.ShouldHaveValidationErrorFor(x => x.ClassGroupIds);
+    }
+
+    [Fact]
+    public void PublishQuiz_ValidRequest_Passes()
+    {
+        var result = _publishQuiz.TestValidate(new PublishQuizRequest { ClassGroupIds = [1, 2] });
+
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void SubmitAttempt_NoAnswers_HasErrors()
+    {
+        var result = _submitAttempt.TestValidate(new SubmitAttemptRequest { Answers = [] });
+
+        result.ShouldHaveValidationErrorFor(x => x.Answers);
+    }
+
+    [Fact]
+    public void SubmitAttempt_ValidRequest_Passes()
+    {
+        var result = _submitAttempt.TestValidate(new SubmitAttemptRequest
+        {
+            Answers = [new AnswerItemDto { OptionIndex = 1 }]
         });
 
         result.IsValid.Should().BeTrue();

@@ -38,6 +38,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddScoped<IQuotaService, QuotaService>();
         services.AddScoped<IAiService, AiService>();
+        services.AddScoped<IQuizService, QuizService>();
+        services.AddScoped<IStudentQuizService, StudentQuizService>();
+        services.AddScoped<IMeService, MeService>();
         services.AddScoped<ISeedingService, SeedingService>();
 
         services.AddHttpClient<IAiClient, GeminiAiClient>(client =>
