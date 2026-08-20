@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using TutoringHub.Application;
 
 namespace TutoringHub.API.Middleware;
 
@@ -46,6 +47,7 @@ public class GlobalExceptionHandler : IMiddleware
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
             KeyNotFoundException => (StatusCodes.Status404NotFound, "Not Found"),
             ArgumentException => (StatusCodes.Status400BadRequest, "Bad Request"),
+            AiClientException => (StatusCodes.Status502BadGateway, "AI Service Error"),
             _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
         };
     }

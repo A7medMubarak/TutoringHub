@@ -11,6 +11,7 @@ using TutoringHub.Application.Services;
 using TutoringHub.Application.Services.Interfaces;
 using TutoringHub.API.Services;
 using TutoringHub.Domain.Interfaces;
+using TutoringHub.Infrastructure.External;
 using TutoringHub.Infrastructure.Persistence;
 using TutoringHub.Infrastructure.Security;
 
@@ -21,6 +22,7 @@ public static class ServiceCollectionExtensions
     public static void AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+        services.Configure<AiOptions>(configuration.GetSection(AiOptions.SectionName));
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
@@ -35,7 +37,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAttendanceService, AttendanceService>();
         services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddScoped<IQuotaService, QuotaService>();
+        services.AddScoped<IAiService, AiService>();
         services.AddScoped<ISeedingService, SeedingService>();
+
+        services.AddHttpClient<IAiClient, GeminiAiClient>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(90);
+        });
 
         services.AddValidatorsFromAssemblyContaining<IAuthService>();
         services.AddFluentValidationAutoValidation();
@@ -68,6 +76,16 @@ public static class ServiceCollectionExtensions
         services.AddRateLimiter(options =>
         {
             options.AddPolicy("auth", context =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 5,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0
+                    }));
+
+            options.AddPolicy("ai", context =>
                 RateLimitPartition.GetFixedWindowLimiter(
                     partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                     factory: _ => new FixedWindowRateLimiterOptions

@@ -7,6 +7,7 @@ using TutoringHub.Application.DTOs.Classes;
 using TutoringHub.Application.DTOs.Students;
 using TutoringHub.Application.DTOs.Enrollments;
 using TutoringHub.Application.DTOs.Quotas;
+using TutoringHub.Application.DTOs.Ai;
 using TutoringHub.Application.Validators;
 using TutoringHub.Domain.Enums;
 
@@ -22,6 +23,8 @@ public class ValidatorTests
     private readonly TickAttendanceRequestValidator _tickAttendance = new();
     private readonly EnrollStudentRequestValidator _enrollStudent = new();
     private readonly CreateQuotaRequestValidator _createQuota = new();
+    private readonly GenerateAiRequestValidator _generateAi = new();
+    private readonly GenerateQuizRequestValidator _generateQuiz = new();
 
     [Fact]
     public void RegisterTeacher_ValidRequest_Passes()
@@ -236,5 +239,107 @@ public class ValidatorTests
         });
 
         result.ShouldHaveValidationErrorFor(x => x.PeriodEnd);
+    }
+
+    [Fact]
+    public void GenerateAi_EmptyPrompt_HasErrors()
+    {
+        var result = _generateAi.TestValidate(new GenerateAiRequest { Prompt = "" });
+
+        result.ShouldHaveValidationErrorFor(x => x.Prompt);
+    }
+
+    [Fact]
+    public void GenerateAi_TooLongPrompt_HasErrors()
+    {
+        var result = _generateAi.TestValidate(new GenerateAiRequest { Prompt = new string('a', 2001) });
+
+        result.ShouldHaveValidationErrorFor(x => x.Prompt);
+    }
+
+    [Fact]
+    public void GenerateAi_ValidRequest_Passes()
+    {
+        var result = _generateAi.TestValidate(new GenerateAiRequest { Prompt = "Hello", JsonMode = true });
+
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void GenerateQuiz_EmptyTopic_HasErrors()
+    {
+        var result = _generateQuiz.TestValidate(new GenerateQuizRequest
+        {
+            Topic = "",
+            QuestionCount = 5,
+            QuestionType = QuestionType.MultipleChoice
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.Topic);
+    }
+
+    [Fact]
+    public void GenerateQuiz_TooLongTopic_HasErrors()
+    {
+        var result = _generateQuiz.TestValidate(new GenerateQuizRequest
+        {
+            Topic = new string('a', 201),
+            QuestionCount = 5,
+            QuestionType = QuestionType.MultipleChoice
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.Topic);
+    }
+
+    [Fact]
+    public void GenerateQuiz_ZeroQuestionCount_HasErrors()
+    {
+        var result = _generateQuiz.TestValidate(new GenerateQuizRequest
+        {
+            Topic = "Math",
+            QuestionCount = 0,
+            QuestionType = QuestionType.MultipleChoice
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.QuestionCount);
+    }
+
+    [Fact]
+    public void GenerateQuiz_TooManyQuestions_HasErrors()
+    {
+        var result = _generateQuiz.TestValidate(new GenerateQuizRequest
+        {
+            Topic = "Math",
+            QuestionCount = 31,
+            QuestionType = QuestionType.MultipleChoice
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.QuestionCount);
+    }
+
+    [Fact]
+    public void GenerateQuiz_InvalidQuestionType_HasErrors()
+    {
+        var result = _generateQuiz.TestValidate(new GenerateQuizRequest
+        {
+            Topic = "Math",
+            QuestionCount = 5,
+            QuestionType = (QuestionType)99
+        });
+
+        result.ShouldHaveValidationErrorFor(x => x.QuestionType);
+    }
+
+    [Fact]
+    public void GenerateQuiz_ValidRequest_Passes()
+    {
+        var result = _generateQuiz.TestValidate(new GenerateQuizRequest
+        {
+            Topic = "Math",
+            QuestionCount = 5,
+            QuestionType = QuestionType.TrueFalse
+        });
+
+        result.IsValid.Should().BeTrue();
     }
 }
