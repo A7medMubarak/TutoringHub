@@ -22,6 +22,10 @@ appsettings.Development.json
 ## Logs
 logs/
 *.log
+*.err
+
+## Frontend lint logs
+frontend/lint*.txt
 
 ## Node / frontend
 node_modules/
