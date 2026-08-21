@@ -1,0 +1,38 @@
+## .NET build artifacts
+bin/
+obj/
+*.user
+
+## Visual Studio
+.vs/
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Rider
+.idea/
+
+## Test results
+TestResults/
+[Tt]est[Rr]esult*/
+
+## App settings - secrets never committed
+appsettings.Development.json
+
+## Logs
+logs/
+*.log
+*.err
+
+## Frontend lint logs
+frontend/lint*.txt
+
+## Node / frontend
+node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+## OS
+Thumbs.db
+.DS_Store
