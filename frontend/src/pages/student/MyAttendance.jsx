@@ -22,7 +22,7 @@ export default function MyAttendance() {
         setLoading(false);
       }
     })();
-  }, [toast, t]);
+  }, []);
 
   if (loading) return <PageLoader label={t('app.loading')} />;
 

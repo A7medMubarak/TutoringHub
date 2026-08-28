@@ -42,7 +42,7 @@ export default function Quizzes() {
     } finally {
       setLoading(false);
     }
-  }, [toast, t]);
+  }, [t]);
 
   useEffect(() => {
     load();

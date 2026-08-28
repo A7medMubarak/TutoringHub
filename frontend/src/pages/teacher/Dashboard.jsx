@@ -40,7 +40,7 @@ export default function Dashboard() {
     return () => {
       active = false;
     };
-  }, [toast, t]);
+  }, []);
 
   if (loading) return <PageLoader label={t('app.loading')} />;
 

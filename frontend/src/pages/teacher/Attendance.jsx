@@ -42,7 +42,7 @@ export default function Attendance() {
     } finally {
       setLoading(false);
     }
-  }, [classId, date, toast, t]);
+  }, [classId, date, t]);
 
   useEffect(() => {
     refresh();

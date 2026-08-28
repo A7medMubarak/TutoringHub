@@ -22,7 +22,7 @@ export default function MyClasses() {
         setLoading(false);
       }
     })();
-  }, [toast, t]);
+  }, []);
 
   if (loading) return <PageLoader label={t('app.loading')} />;
 
