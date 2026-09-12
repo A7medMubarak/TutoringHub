@@ -127,4 +127,3 @@ The AI client retries on transient failures (429/503), requests JSON-only respon
 
 - Send the Gemini API key via the `x-goog-api-key` header instead of the URL query string (or migrate to OAuth2 bearer tokens) so keys never appear in proxy/access logs.
 - Exponential backoff with `Retry-After` handling for AI calls.
-- GitHub Actions CI pipeline with a build + test badge.
