@@ -9,6 +9,7 @@ A tutoring-center management platform for teachers who run class groups in physi
 ![React](https://img.shields.io/badge/React-19.2-61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4)
+![CI](https://github.com/A7medMubarak/TutoringHub/actions/workflows/build.yml/badge.svg)
 
 ## Screenshots
 
