@@ -105,6 +105,14 @@ dotnet build TutoringHub.sln
 dotnet test tests/TutoringHub.Application.Tests/TutoringHub.Application.Tests.csproj
 ```
 
+## Continuous Integration
+
+GitHub Actions runs on every push and pull request to `main`:
+- **Backend** — restore, build the solution, and run the full test suite (141 xUnit tests).
+- **Frontend** — install dependencies, lint, and produce a production build.
+
+The README badge above reflects the latest run status.
+
 ## Gemini AI Integration (Optional)
 
 The quiz generator calls Google Gemini. Without a key the app works fully except AI generation.
