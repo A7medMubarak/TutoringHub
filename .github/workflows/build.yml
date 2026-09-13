@@ -80,6 +80,9 @@ jobs:
           $profile = Get-Content publish.pubxml -Raw
           $publishUrl = [regex]::Match($profile, '<publishUrl>(.*?)</publishUrl>').Groups[1].Value
           $siteName = [regex]::Match($profile, '<DeployIisAppPath>(.*?)</DeployIisAppPath>').Groups[1].Value
+          if (-not $siteName) {
+            $siteName = [regex]::Match($publishUrl, '[?&]site=([^&]+)').Groups[1].Value
+          }
           $userName = [regex]::Match($profile, '<UserName>(.*?)</UserName>').Groups[1].Value
           $password = [regex]::Match($profile, '<Password>(.*?)</Password>').Groups[1].Value
 
