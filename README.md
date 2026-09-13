@@ -2,6 +2,13 @@
 
 A tutoring-center management platform for teachers who run class groups in physical centers. It handles attendance tracking, attendance-based postpaid billing with FIFO quota coverage, student/teacher portals, and AI-assisted quiz generation — designed mobile-first with an Arabic RTL interface.
 
+## Live Demo
+
+- **Frontend:** https://tutoring-hub-psi.vercel.app/
+- **API:** https://tutoringhub.runasp.net (Swagger enabled locally only)
+
+> Hosted on a free-tier plan — the API may take a few seconds to wake up after being idle. Demo credentials are below.
+
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-8.0-512BD4)
 ![EF Core](https://img.shields.io/badge/EF%20Core-8.0-512BD4)
@@ -110,6 +117,7 @@ dotnet test tests/TutoringHub.Application.Tests/TutoringHub.Application.Tests.cs
 GitHub Actions runs on every push and pull request to `main`:
 - **Backend** — restore, build the solution, and run the full test suite (141 xUnit tests).
 - **Frontend** — install dependencies, lint, and produce a production build.
+- **Deploy** — on pushes to `main`, the API is published and deployed to the live demo via Web Deploy.
 
 The README badge above reflects the latest run status.
 
