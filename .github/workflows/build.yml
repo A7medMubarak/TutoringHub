@@ -77,12 +77,12 @@ jobs:
           PUBXML: ${{ secrets.MONSTER_PUBLISH_PROFILE }}
         run: |
           $env:PUBXML | Set-Content -Path publish.pubxml -Encoding utf8
-          $profile = Get-Content publish.pubxml -Raw
-          $publishUrl = [regex]::Match($profile, '<publishUrl>(.*?)</publishUrl>').Groups[1].Value
-          $siteName = $publishUrl.Split('.')[0]
+          [xml]$profileXml = Get-Content publish.pubxml -Raw
+          $publishUrl = $profileXml.publishData.publishProfile.publishUrl
+          $siteName = $profileXml.publishData.publishProfile.msdeploySite
+          $userName = $profileXml.publishData.publishProfile.userName
+          $password = $profileXml.publishData.publishProfile.userPWD
           $endpoint = "https://${publishUrl}:8172/msdeploy.axd?site=${siteName}"
-          $userName = [regex]::Match($profile, '<UserName>(.*?)</UserName>').Groups[1].Value
-          $password = [regex]::Match($profile, '<Password>(.*?)</Password>').Groups[1].Value
 
           $msdeploy = Get-ChildItem "$env:ProgramFiles\IIS" -Recurse -Filter msdeploy.exe -ErrorAction SilentlyContinue |
             Select-Object -ExpandProperty FullName -First 1
