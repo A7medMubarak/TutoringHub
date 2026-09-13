@@ -105,6 +105,11 @@ public static class ServiceCollectionExtensions
     public static void AddCorsPolicy(this IServiceCollection services, IConfiguration configuration)
     {
         var origins = configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
+        var frontendUrl = configuration["FrontendUrl"];
+        if (!string.IsNullOrWhiteSpace(frontendUrl) && !origins.Contains(frontendUrl))
+        {
+            origins = [.. origins, frontendUrl];
+        }
 
         services.AddCors(options =>
         {

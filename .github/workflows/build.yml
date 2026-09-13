@@ -53,3 +53,47 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  deploy:
+    name: Deploy API to Monster
+    needs: [backend, frontend]
+    runs-on: windows-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Publish
+        run: dotnet publish src/TutoringHub.API/TutoringHub.API.csproj -c Release -o ./publish
+
+      - name: Deploy via Web Deploy
+        shell: powershell
+        env:
+          PUBXML: ${{ secrets.MONSTER_PUBLISH_PROFILE }}
+        run: |
+          $env:PUBXML | Set-Content -Path publish.pubxml -Encoding utf8
+          $profile = Get-Content publish.pubxml -Raw
+          $publishUrl = [regex]::Match($profile, '<publishUrl>(.*?)</publishUrl>').Groups[1].Value
+          $siteName = [regex]::Match($profile, '<DeployIisAppPath>(.*?)</DeployIisAppPath>').Groups[1].Value
+          $userName = [regex]::Match($profile, '<UserName>(.*?)</UserName>').Groups[1].Value
+          $password = [regex]::Match($profile, '<Password>(.*?)</Password>').Groups[1].Value
+
+          $msdeploy = Get-ChildItem "$env:ProgramFiles\IIS" -Recurse -Filter msdeploy.exe -ErrorAction SilentlyContinue |
+            Select-Object -ExpandProperty FullName -First 1
+          if (-not $msdeploy) {
+            choco install webdeploy -y --no-progress | Out-Null
+            $msdeploy = Get-ChildItem "$env:ProgramFiles\IIS" -Recurse -Filter msdeploy.exe -ErrorAction SilentlyContinue |
+              Select-Object -ExpandProperty FullName -First 1
+          }
+          if (-not $msdeploy) { throw "msdeploy.exe not found" }
+
+          $source = Join-Path $env:GITHUB_WORKSPACE 'publish'
+          & $msdeploy '-verb:sync' "-source:contentPath=$source" `
+            "-dest:contentPath=$siteName,computerName=$publishUrl,userName=$userName,password=$password,authtype=Basic,includeAcls=False" `
+            -allowUntrusted -disableLink:AppPoolExtension -disableLink:ContentExtension -disableLink:CertificateExtension
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
