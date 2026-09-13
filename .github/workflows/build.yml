@@ -79,10 +79,8 @@ jobs:
           $env:PUBXML | Set-Content -Path publish.pubxml -Encoding utf8
           $profile = Get-Content publish.pubxml -Raw
           $publishUrl = [regex]::Match($profile, '<publishUrl>(.*?)</publishUrl>').Groups[1].Value
-          $siteName = [regex]::Match($profile, '<DeployIisAppPath>(.*?)</DeployIisAppPath>').Groups[1].Value
-          if (-not $siteName) {
-            $siteName = [regex]::Match($publishUrl, '[?&]site=([^&]+)').Groups[1].Value
-          }
+          $siteName = $publishUrl.Split('.')[0]
+          $endpoint = "https://${publishUrl}:8172/msdeploy.axd?site=${siteName}"
           $userName = [regex]::Match($profile, '<UserName>(.*?)</UserName>').Groups[1].Value
           $password = [regex]::Match($profile, '<Password>(.*?)</Password>').Groups[1].Value
 
@@ -97,6 +95,6 @@ jobs:
 
           $source = Join-Path $env:GITHUB_WORKSPACE 'publish'
           & $msdeploy '-verb:sync' "-source:contentPath=$source" `
-            "-dest:contentPath=$siteName,computerName=$publishUrl,userName=$userName,password=$password,authtype=Basic,includeAcls=False" `
+            "-dest:contentPath=$siteName,computerName=$endpoint,userName=$userName,password=$password,authtype=Basic,includeAcls=False" `
             -allowUntrusted -disableLink:AppPoolExtension -disableLink:ContentExtension -disableLink:CertificateExtension
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
