@@ -39,6 +39,9 @@ try
         var seeder = scope.ServiceProvider.GetRequiredService<ISeedingService>();
         await seeder.SeedDefaultTeacherAsync(
             builder.Configuration["DefaultAdminPassword"] ?? "admin123");
+
+        if (builder.Configuration.GetValue<bool>("SeedDemo:Enabled"))
+            await seeder.SeedDemoDataAsync();
     }
 
     if (app.Environment.IsDevelopment())
